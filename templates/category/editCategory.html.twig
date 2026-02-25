@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+
+    <div class="card shadow p-4" style="width: 400px;">
+        <h2 class="mb-4 text-center">Edit Category</h2>
+
+        {{ form_start(formCategory) }}
+
+            {{ form_row(formCategory.name, {'attr': {'class': 'form-control'}}) }}
+
+            <button type="submit" class="btn btn-success mt-3 w-100">
+                Update
+            </button>
+
+        {{ form_end(formCategory) }}
+
+    </div>
+
+</div>
+{% endblock %}
