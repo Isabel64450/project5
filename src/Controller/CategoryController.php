@@ -20,7 +20,7 @@ final class CategoryController extends AbstractController
         ]);
     }
 
-    #[Route('/category/new', name: 'app_category_new')]
+    #[Route('/admin/category/new', name: 'app_category_new')]
     public function addCategory(EntityManagerInterface $entityManager, Request $request): Response
     {   
         $category = new Category();
@@ -29,6 +29,7 @@ final class CategoryController extends AbstractController
         if($form->isSubmitted() && $form->isValid() ){
             $entityManager->persist($category);
             $entityManager->flush();
+            $this->addFlash('success', 'Votre catégorie à bien été créée');
         }
 
         return $this->render('category/newCategory.html.twig', [
@@ -37,18 +38,16 @@ final class CategoryController extends AbstractController
     }
 
 
-    #[Route('/category/{id}/edit', name: 'app_category_edit', requirements: ['id' => '\d+'])]
-    public function editCategory(
-    Category $category,
-    Request $request,
-    EntityManagerInterface $entityManager): Response 
+    #[Route('/admin/category/{id}/edit', name: 'app_category_edit', requirements: ['id' => '\d+'])]
+    public function editCategory(Category $category, Request $request, EntityManagerInterface $entityManager): Response 
     {
     
        $form = $this->createForm(CategoryFormType::class, $category);
        $form->handleRequest($request);    
        if ($form->isSubmitted() && $form->isValid()) {        
         $entityManager->flush();
-        return $this->redirectToRoute('app_category_new'); 
+        $this->addFlash('success', 'Votre catégorie à bien été modifiée.');
+        return $this->redirectToRoute('app_categories_list'); 
     }
 
     return $this->render('category/editCategory.html.twig', [
@@ -58,9 +57,31 @@ final class CategoryController extends AbstractController
 
     }
 
+    #[Route('/admin/categories', name: 'app_categories_list')]
+    public function listCategories(EntityManagerInterface $entityManager): Response
+    {
+    
+    $categories = $entityManager->getRepository(Category::class)->findAll();
 
+   
+    return $this->render('category/list.html.twig', [
+        'categories' => $categories,
+    ]);
 
+    }
 
+    #[Route('/admin/category/{id}/delete', name: 'app_category_delete', requirements: ['id' => '\d+'])]
+    public function deleteCategory(Category $category, EntityManagerInterface $entityManager): Response 
+    {
+    
+      $entityManager->remove($category);
+      $entityManager->flush();
+
+      $this->addFlash('danger', 'Votre catégorie à bien été supprimée.');
+
+    return $this->redirectToRoute('app_categories_list');
+
+    }
 
 
 }
