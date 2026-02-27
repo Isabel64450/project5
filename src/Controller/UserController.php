@@ -29,24 +29,47 @@ final class UserController extends AbstractController
 
         $entityManager->flush();
 
-        $this->addFlash('success', sprintf('Le rôle éditeur a été ajouté à %s !', $user->getUserIdentifier()));
+        $this->addFlash('success', 'Votre user à bien été modifiée à editor.');
 
         return $this->redirectToRoute('app_user_list');
     }
+
+    
+    #[Route('/admin/user/{id}/delete/editor/role', name: 'app_user_delete_editor_role')]
+    public function deleteRoleEditor(EntityManagerInterface $entityManager, User $user): Response
+    {
+    $roles = $user->getRoles();    
+    $roles = array_diff($roles, ['ROLE_EDITOR']);    
+    $roles = array_diff($roles, ['ROLE_USER']);
+    $user->setRoles($roles);
+    $entityManager->flush();
+    $this->addFlash('danger', "Le rôle éditeur a bien été retiré à l'utilisateur");
+    return $this->redirectToRoute('app_user_list');
+    }
+
+
 
     #[Route('/users', name: 'app_user_list')]
     public function listUsers(EntityManagerInterface $entityManager): Response
     {
     
     $users = $entityManager->getRepository(User::class)->findAll();
-
    
     return $this->render('user/list.html.twig', [
         'users' => $users,
     ]);
-}
+    }
 
+    #[Route('/admin/user/{id}/remove/', name: 'app_user_remove',requirements: ['id' => '\d+'])]
+    public function deleteUser(User $user ,EntityManagerInterface $entityManager): Response
+    {        
+        $entityManager->remove($user);
+        $entityManager->flush();
 
+        $this->addFlash('danger', "L'utilisateur à bien été supprimé.");
+        
+        return $this->redirectToRoute('app_user_list');
+    }
 
 
 
