@@ -31,8 +31,12 @@
                   <li><a class="dropdown-item" href="{{ path('app_category') }}">Catégories</a></li>
                   <li><a class="dropdown-item" href="{{ path('app_category_new') }}">Ajouter une catégorie</a></li>
                   <li><hr class="dropdown-divider"></li>
-                 
+                 <li><a class="dropdown-item" href="{{ path('app_sub_category_index') }}">Sous-catégories</a></li>
+                  <li><a class="dropdown-item" href="{{ path('app_sub_category_new') }}">Ajouter une sous-catégorie</a></li>
                   
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{{ path('app_product_index') }}">Produits</a></li>
+                  <li><a class="dropdown-item" href="{{ path('app_product_new') }}">Ajouter un produit</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item" href="{{ path('app_user_list')}}">Utilisateurs</a></li>
                   
@@ -42,7 +46,7 @@
 
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Products</a> 
+                    <a class="nav-link" href="{{ path('app_product_index')}}">Products</a> 
                 </li>
 
              

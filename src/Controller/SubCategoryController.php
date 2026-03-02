@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\SubCategory;
-use App\Form\SubCategory1Type;
 use App\Form\SubCategoryType;
 use App\Repository\SubCategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
