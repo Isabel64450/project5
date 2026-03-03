@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\AddProductHistory;
 use App\Entity\Product;
+use App\Form\AddProductHistoryType;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -51,6 +54,13 @@ final class ProductController extends AbstractController
 
             $entityManager->persist($product);
             $entityManager->flush();
+            $stockHistory = new AddProductHistory();
+            $stockHistory->setQuantity($product->getStock());
+            $stockHistory->setProduct($product);
+            $stockHistory->setCreatedAt(new DateTimeImmutable());
+            $entityManager->persist($stockHistory);
+            $entityManager->flush();
+
             $this->addFlash('success', 'Votre produit à bien été créée');
 
             return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
@@ -61,11 +71,6 @@ final class ProductController extends AbstractController
             'form' => $form,
         ]);
     }
-
-
-
-
-
 
     #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
     public function show(Product $product): Response
@@ -118,4 +123,69 @@ final class ProductController extends AbstractController
         $this->addFlash('danger', 'Votre produit à bien été supprimée.');
         return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
     }
+
+#[Route('/add/product/{id}/stock', name: 'app_product_stock_add', methods: ['POST','GET'])]
+    public function stockAdd($id, EntityManagerInterface $entityManager, Request $request, ProductRepository $productRepository): Response
+    {
+        $stockAdd = new AddProductHistory();
+        $form =$this->createForm(AddProductHistoryType::class, $stockAdd);
+        $form->handleRequest($request);
+
+        $product = $productRepository->find($id);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            if($stockAdd->getQuantity()>0){
+                $newQuantity = $product->getStock() + $stockAdd->getQuantity();
+                $product->setStock($newQuantity);
+
+                $stockAdd->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+                $stockAdd->setProduct($product);
+                $entityManager->persist($stockAdd);
+                $entityManager->flush();
+
+                $this->addFlash('success', "Le stock du produit à été modifié");
+                return $this->redirectToRoute('app_product_index');
+            }else {
+                $this->addFlash('danger', "Le stock du produit ne doit pas être inférieur à zéro");
+                return $this->redirectToRoute('app_product_stock_add', ['id'=>$product->getId()]);
+            }
+  
+        }
+
+        return $this->render('product/addStock.html.twig',
+            ['form'=> $form->createView(),
+             'product' => $product,
+            ]
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
