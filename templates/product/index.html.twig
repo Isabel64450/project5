@@ -16,6 +16,7 @@
                 <th>Description</th>
                 <th>Price</th>
                 <th>category</th> 
+                <th>stock</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -24,7 +25,7 @@
             <tr>
                 
                 <td>{{ product.name }}</td>
-                <td>{{ product.description }}</td>
+                <td>{{ product.description|slice(0,100) }} ...</td>
                 <td>{{ product.price }}</td>
                 <td>{% for subCategory in product.subCategory %}
                     {{ subCategory.name }}<br>
@@ -32,10 +33,17 @@
                     Aucune
                 {% endfor %}
                 </td>
-                 
+                 <td>
+                    {% if product.stock > 0  %}
+                        {{ product.stock }}
+                        
+                    {% else %}
+                        <span class="text-danger">Stock épuisé</span>
+                    {% endif %}
+                </td>
                 <td>
-                    <a href="{{ path('app_product_show', {'id': product.id}) }}">show</a>
-                    <a href="{{ path('app_product_edit', {'id': product.id}) }}">edit</a>
+                    <a class="btn btn-primary" href="{{ path('app_product_show', {'id': product.id}) }}">show</a>
+                    <a class="btn btn-outline-success" onclick=" return confirm('Voulez vous vraiment modifier le produit ?')" href="{{ path('app_product_edit', {'id': product.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
