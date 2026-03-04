@@ -6,6 +6,8 @@ use App\Entity\AddProductHistory;
 use App\Entity\Product;
 use App\Form\AddProductHistoryType;
 use App\Form\ProductType;
+use App\Form\ProductUpdateType;
+use App\Repository\AddProductHistoryRepository;
 use App\Repository\ProductRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -83,7 +85,7 @@ final class ProductController extends AbstractController
     #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
-        $form = $this->createForm(ProductType::class, $product);
+        $form = $this->createForm(ProductUpdateType::class, $product);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -160,7 +162,17 @@ final class ProductController extends AbstractController
         );
     }
 
+    #[Route('/add/product/{id}/stock/history', name: 'app_product_stock_add_history', methods: ['GET'])]
+    public function showHistoryProductStock($id, ProductRepository $productRepository, AddProductHistoryRepository $addProductHistoryRepository):Response
+    {
 
+        $product = $productRepository->find($id);
+        $productAddHistory = $addProductHistoryRepository->findBy(['product'=>$product],['id'=>'DESC']);
+        
+        return $this->render('product/addedHistoryStockShow.html.twig',[
+            "productsAdded"=>$productAddHistory
+        ]);
+    }
 
 
 
