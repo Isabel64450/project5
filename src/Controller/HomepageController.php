@@ -27,7 +27,7 @@ final class HomepageController extends AbstractController
     public function showProduct(Product $product, ProductRepository $productRepository,CategoryRepository $categoryRepository): Response 
     
     {
-        $lastProductsAdd = $productRepository->findBy([],['id'=>'DESC'],5);//on crée la variable a laquelle on donne le repo et lam ethode findBy, puis on donne une limit de 5 en affichage
+        $lastProductsAdd = $productRepository->findBy([],['id'=>'DESC'],4);
 
         return $this->render('homepage/show.html.twig', [ 
             'product'=>$product,
