@@ -6,10 +6,10 @@
 <div class="container">
     <h1 class="mb-5 mt-5">Produits de la boutique</h1>
     
-    <div class="row">
+    <div class="row g-4">
         {% for product in products %}
-            <div class="col-md-3 mt-4">
-                <div class="card" style="width: 18rem;">
+            <div class="col-12 col-md-6 col-lg-3 ">
+                <div class="card h-100" >
                    <img src="{{ asset('uploads/images/'~product.images)}}" class="imgproduct card-img-top" alt="image des produits"> 
                     <div class="card-body">
                         <a class="titleProductLink" href=" {{ path('app_home_product_show',{'id':product.id}) }} "><h5 class="card-title titleProduct">{{ product.name }}</h5></a> 
@@ -21,6 +21,9 @@
             </div>
         {% endfor %}
     </div>
-    {# {{ knp_pagination_render(products, 'layouts/pagination_template.html.twig') }} #}
+    <div class="mt-5">
+     {{ knp_pagination_render(products, 'layouts/pagination_template.html.twig') }} 
+    </div>
+   
 </div>
 {% endblock %}
