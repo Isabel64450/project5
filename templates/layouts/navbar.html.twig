@@ -83,6 +83,14 @@
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
+            <a href="{{ path('app_cart') }}" class="btn btn-outline-dark ms-3 position-relative">
+                 <i class="bi bi-cart"></i>
+                 {% if cartCount > 0 %}
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                 {{ cartCount }}
+                </span>
+                 {% endif %}
+            </a>
         </div>
     </div>
 </nav>
