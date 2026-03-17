@@ -57,23 +57,48 @@ final class CartController extends AbstractController
     }
 
 
- #[Route("/cart/remove/{id}/", name: "app_cart_product_remove", methods: ['GET'])]
-    public function removeToCart($id, SessionInterface $session): Response
-    {        
-        $cart = $session->get('cart', []);       
-        if (!empty($cart[$id])) {           
-            unset($cart[$id]);
-        }        
-        $session->set('cart', $cart);        
-        return $this->redirectToRoute('app_cart');
-    }
-
-    #[Route("/cart/remove", name: "app_cart_remove", methods: ['GET'])]
+ 
+     #[Route("/cart/remove", name: "app_cart_remove", methods: ['GET'])]
     public function remove(SessionInterface $session): Response
     {        
         $session->set('cart', []);       
         return $this->redirectToRoute('app_cart');
     }
+ 
+
+     #[Route("/cart/increase/{id}", name: "app_cart_increase")]
+     public function increase(int $id, SessionInterface $session, Request $request): Response
+{
+    $cart = $session->get('cart', []);
+
+    if (!empty($cart[$id])) {
+        $cart[$id]++;
+    }
+
+    $session->set('cart', $cart);
+    return $this->redirectToRoute('app_cart');
+  
+}
+
+#[Route("/cart/decrease/{id}", name: "app_cart_decrease")]
+public function decrease(int $id, SessionInterface $session, Request $request): Response
+{
+    $cart = $session->get('cart', []);
+
+    if (!empty($cart[$id])) {
+        if ($cart[$id] > 1) {
+            $cart[$id]--;
+        } else {
+            unset($cart[$id]); 
+        }
+    }
+
+    $session->set('cart', $cart);
+    return $this->redirectToRoute('app_cart');
+    
+}
+
+
 
 
 

@@ -8,20 +8,22 @@
         <table class="table table-bordered">
             <tr>
                 <th>Produit</th>
-                <th>Prix</th>
+                <th>Prix unité</th>
                 <th>Quantité</th>
                 <th>Prix total</th>
-                <th>Action</th>
+                
             </tr>
             {% for item in items %}
                 <tr>
                     <td>{{ item.product.name }} </td>
                     <td>{{ item.product.price }} </td>
-                    <td>{{ item.quantity }} </td>
+                    <td> <a href=" {{ path('app_cart_decrease', {'id': item.product.id}) }}" class="btn btn-sm btn-outline-danger">-</a>
+    
+                           <span class="mx-2">{{ item.quantity }}</span>
+    
+                         <a href="{{ path('app_cart_increase', {'id': item.product.id}) }}" class="btn btn-sm btn-outline-success">+</a> </td>
                     <td>{{ item.product.price * item.quantity }} </td>
-                    <td>
-                        <a href=" {{ path('app_cart_product_remove',{'id':item.product.id }) }} " class="text-danger text-decoration-none">Supprimer du panier</a> 
-                    </td>
+                    
                 </tr>
             {% else %}
                 <p>Votre panier est vide</p>
