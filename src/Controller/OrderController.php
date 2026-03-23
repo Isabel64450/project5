@@ -4,8 +4,13 @@ namespace App\Controller;
 
 use App\Entity\City;
 use App\Entity\Order;
+use App\Entity\OrderProducts;
 use App\Form\OrderType;
+use App\Repository\OrderProductsRepository;
+use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
+use App\Service\Cart;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,28 +20,43 @@ use Symfony\Component\Routing\Attribute\Route;
 final class OrderController extends AbstractController
 {
     #[Route('/order', name: 'app_order')]
-    public function index(Request $request, SessionInterface $session, ProductRepository $productRepository): Response
+    public function index(Request $request, SessionInterface $session, ProductRepository $productRepository, EntityManagerInterface $entityManager, Cart $cart): Response
     {   
+        $data=$cart->getCart($session);
         $order = new Order();
         $form = $this->createForm(OrderType::class, $order);
-        $form->handleRequest($request);
-        $cart =$session->get('cart',[]);
-           $cartWithData = [];
-           foreach ($cart as $id => $quantity){
-            $cartWithData[]=[
-                'product'=>$productRepository->find($id),
-                'quantity'=>$quantity
-             ];
+        $form->handleRequest($request);       
+        if($form->isSubmitted() && $form->isValid()){
+            if($order->isPayOnDelivery()){
+                if(!empty($data['total'])){
+
+                $order->setTotalPrice($data['total']);
+                $order->setCreatedAt(new \DateTimeImmutable());
+                $entityManager->persist($order);
+                $entityManager->flush();
+
+            foreach ($data['cart'] as $value){
+            $orderProduct = new OrderProducts();
+            $orderProduct->setOrder($order);
+            $orderProduct->setProduct($value['product']);
+            $orderProduct->setQuantity($value['quantity']);
+            $entityManager->persist($orderProduct);
+            
            }
+            $entityManager->flush();
+         }
 
-        $total =array_sum(array_map(function ($item) {
-            return $item['product']->getPrice()* $item['quantity'];
-        }, $cartWithData));
+          $session->set('cart',[]);
+          return $this->redirectToRoute('app_order_message');  
 
+        }              
+
+            }
+            
+       
         return $this->render('order/index.html.twig', [
-            'form' => $form->createView(),
-            'items' => $cartWithData,
-            'total'=>$total
+            'form' => $form->createView(),           
+            'total'=>$data['total']
         ]);
     }
 
@@ -50,6 +70,20 @@ final class OrderController extends AbstractController
     }
 
 
+     #[Route('/order_message', name:'app_order_message')]
+     public function orderMessage():Response
+     {
+        return $this->render('order/order_message.html.twig');
+     }
+
+#[Route('/orders', name:'app_orders_show')]
+public function getAllOrdes(OrderRepository $orderRepository):Response
+{
+    $orders=$orderRepository->findAll();
+    return $this->render('order/order.html.twig', [
+        'orders'=>$orders
+    ]);
+}
 
 
 }
