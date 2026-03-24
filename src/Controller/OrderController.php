@@ -6,11 +6,11 @@ use App\Entity\City;
 use App\Entity\Order;
 use App\Entity\OrderProducts;
 use App\Form\OrderType;
-use App\Repository\OrderProductsRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use App\Service\Cart;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,8 +29,8 @@ final class OrderController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
             if($order->isPayOnDelivery()){
                 if(!empty($data['total'])){
-
-                $order->setTotalPrice($data['total']);
+                $totalPrice = $data['total'] + $order->getCity()->getShippingCost();
+                $order->setTotalPrice($totalPrice);
                 $order->setCreatedAt(new \DateTimeImmutable());
                 $entityManager->persist($order);
                 $entityManager->flush();
@@ -77,13 +77,42 @@ final class OrderController extends AbstractController
      }
 
 #[Route('/orders', name:'app_orders_show')]
-public function getAllOrdes(OrderRepository $orderRepository):Response
-{
-    $orders=$orderRepository->findAll();
+public function getAllOrdes(OrderRepository $orderRepository, PaginatorInterface $paginator, Request $request):Response
+{    
+            $data=$orderRepository->findAll();
+            $orders = $paginator->paginate(
+            $data,
+            $request->query->getInt('page', 1),
+            1
+        );
+    
     return $this->render('order/order.html.twig', [
         'orders'=>$orders
     ]);
 }
+
+#[Route('/order/{id}/is-completed/update', name:'app_orders_is-completed-update')]
+
+public function isCompletedUpdate($id,OrderRepository $orderRepository, EntityManagerInterface $entityManager):Response
+{ 
+        $order = $orderRepository->find($id);
+        $order->setIsCompleted(!$order->isCompleted());
+        $entityManager->flush();
+              
+
+        return $this->redirectToRoute('app_orders_show');
+
+}
+
+#[Route('/order/{id}/remove', name:'app_orders_remove')]
+public function removeOrder(Order $order, EntityManagerInterface $entityManager):Response
+
+{
+    $entityManager->remove($order);
+    $entityManager->flush();
+    return $this->redirectToRoute('app_orders_show');
+}
+
 
 
 }
