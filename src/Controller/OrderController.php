@@ -9,6 +9,7 @@ use App\Form\OrderType;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use App\Service\Cart;
+use App\Service\StripePayment;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -56,14 +57,24 @@ final class OrderController extends AbstractController
           $html = $this->renderView('mail/orderConfirm.html.twig',['order'=>$order]);
           $email = (new Email())
           ->from('izaberu.creations@gmail.com')
-          ->to('test@gmail.com')
+          ->to($order->getEmail())
           ->subject('Confirmation of order receipt')
           ->html($html);
           $this->mailer->send($email);
          
           return $this->redirectToRoute('app_order_message');  
 
-        }              
+        }  
+        
+                   $paymentStripe = new StripePayment(); 
+                    $shippingCost = $order->getCity()->getShippingCost();
+                    $paymentStripe->startPayment($data, $shippingCost, $order->getId()); 
+                    $stripeRedirectUrl = $paymentStripe->getStripeRedirectUrl();
+                    /* dd( $stripeRedirectUrl); */
+                    return $this->redirect($stripeRedirectUrl);
+                
+
+
 
             }
             
