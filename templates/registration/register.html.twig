@@ -26,7 +26,23 @@
                 {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
                 {{ form_errors(registrationForm.email) }}
             </div>
+            
 
+
+            <div class="mb-3">
+                {{ form_label(registrationForm.dateOfBirth, 'Date de naissance', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.dateOfBirth, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(registrationForm.dateOfBirth) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(registrationForm.gender, 'Genre', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(registrationForm.gender, {'attr': {'class': 'form-select'}}) }}
+                {{ form_errors(registrationForm.gender) }}
+            </div>
+
+            
+            
             <div class="mb-3">
                 {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'form-label'}}) }}
                 {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}

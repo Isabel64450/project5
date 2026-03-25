@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -38,6 +39,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $dateOfBirth = null;
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $inscriptionDate = null;
+
+    #[ORM\Column(length: 20)]
+    private ?string $gender = null;
+
+    #[ORM\Column]
+    private ?bool $isActive = null;
 
     public function getId(): ?int
     {
@@ -140,6 +153,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getDateOfBirth(): ?\DateTimeImmutable
+    {
+        return $this->dateOfBirth;
+    }
+
+    public function setDateOfBirth(\DateTimeImmutable $dateOfBirth): static
+    {
+        $this->dateOfBirth = $dateOfBirth;
+
+        return $this;
+    }
+
+    public function getInscriptionDate(): ?\DateTimeImmutable
+    {
+        return $this->inscriptionDate;
+    }
+
+    public function setInscriptionDate(\DateTimeImmutable $inscriptionDate): static
+    {
+        $this->inscriptionDate = $inscriptionDate;
+
+        return $this;
+    }
+
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    public function setGender(string $gender): static
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }
