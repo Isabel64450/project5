@@ -34,33 +34,35 @@ final class OrderController extends AbstractController
         $form = $this->createForm(OrderType::class, $order);
         $form->handleRequest($request);       
         if($form->isSubmitted() && $form->isValid()){
-            if($order->isPayOnDelivery()){
-                if(!empty($data['total'])){
-                $totalPrice = $data['total'] + $order->getCity()->getShippingCost();
-                $order->setTotalPrice($totalPrice);
-                $order->setCreatedAt(new \DateTimeImmutable());
-                $entityManager->persist($order);
-                $entityManager->flush();
-
-            foreach ($data['cart'] as $value){
-            $orderProduct = new OrderProducts();
-            $orderProduct->setOrder($order);
-            $orderProduct->setProduct($value['product']);
-            $orderProduct->setQuantity($value['quantity']);
-            $entityManager->persist($orderProduct);
             
-           }
-            $entityManager->flush();
-         }
+                if(!empty($data['total'])){
+                    $totalPrice = $data['total'] + $order->getCity()->getShippingCost();
+                    $order->setTotalPrice($totalPrice);
+                    $order->setCreatedAt(new \DateTimeImmutable());
+                    $order->setIsPaymentCompleted(0);
+                    $entityManager->persist($order);
+                    $entityManager->flush();
 
-          $session->set('cart',[]);
-          $html = $this->renderView('mail/orderConfirm.html.twig',['order'=>$order]);
-          $email = (new Email())
-          ->from('izaberu.creations@gmail.com')
-          ->to($order->getEmail())
-          ->subject('Confirmation of order receipt')
-          ->html($html);
-          $this->mailer->send($email);
+                    foreach ($data['cart'] as $value){
+                        $orderProduct = new OrderProducts();
+                        $orderProduct->setOrder($order);
+                        $orderProduct->setProduct($value['product']);
+                        $orderProduct->setQuantity($value['quantity']);
+                        $entityManager->persist($orderProduct);
+                        $entityManager->flush();
+            
+                           }
+             if($order->isPayOnDelivery()){
+         
+         
+                    $session->set('cart',[]);
+                    $html = $this->renderView('mail/orderConfirm.html.twig',['order'=>$order]);
+                    $email = (new Email())
+                    ->from('izaberu.creations@gmail.com')
+                    ->to($order->getEmail())
+                    ->subject('Confirmation of order receipt')
+                    ->html($html);
+                     $this->mailer->send($email);
          
           return $this->redirectToRoute('app_order_message');  
 
@@ -70,15 +72,12 @@ final class OrderController extends AbstractController
                     $shippingCost = $order->getCity()->getShippingCost();
                     $paymentStripe->startPayment($data, $shippingCost, $order->getId()); 
                     $stripeRedirectUrl = $paymentStripe->getStripeRedirectUrl();
-                    /* dd( $stripeRedirectUrl); */
-                    return $this->redirect($stripeRedirectUrl);
-                
-
-
+                   
+                    return $this->redirect($stripeRedirectUrl);             
 
             }
             
-       
+        }
         return $this->render('order/index.html.twig', [
             'form' => $form->createView(),           
             'total'=>$data['total']

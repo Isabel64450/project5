@@ -15,7 +15,7 @@ class StripePayment
 }
 
  public function startPayment($cart, $shippingCost, $orderId){
-        /* dd($cart); */
+       
       
         $cartProducts = $cart['cart']; 
         
