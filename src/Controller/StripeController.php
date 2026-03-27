@@ -69,24 +69,26 @@ public function cancel(): Response
                 $paymentIntent = $event->data->object;
                 
                 // // Enregistrer les détails du paiement dans un fichier
-                $fileName = 'stripe-detail-'.uniqid().'.txt';
+                /* $fileName = 'stripe-detail-'.uniqid().'.txt'; */
 
                  $orderId = $paymentIntent->metadata->orderId;
                  $order = $orderRepository->find($orderId);
+                 $cartPrice=$order->getTotalPrice();
+                 $stripeTotalAmount = $paymentIntent->amount/100;
                  $order->setIsPaymentCompleted(1);
                  $entityManager->flush();
                 /*if(!$order) {
                     return new Response('Commande non trouvée', 404);
                 }
 
-                $cartPrice = $order->getTotalPrice();
-                $stripeTotalAmount = $paymentIntent->amount/100;
+                $cartPrice = $order->getTotalPrice();*/
+                
 
                 if($cartPrice==$stripeTotalAmount){
                     $order->setIsPaymentCompleted(1);
                     $entityManager->flush();
-                }  */
-                file_put_contents($fileName, $orderId);
+                }  
+                /* file_put_contents($fileName, $orderId); */
                 break;
             case 'payment_method.attached':   // Événement de méthode de paiement attachée
                 // Récupérer l'objet payment_method

@@ -100,31 +100,42 @@ final class OrderController extends AbstractController
         return $this->render('order/order_message.html.twig');
      }
 
-#[Route('/orders', name:'app_orders_show')]
-public function getAllOrdes(OrderRepository $orderRepository, PaginatorInterface $paginator, Request $request):Response
-{    
-            $data=$orderRepository->findAll();
-            $orders = $paginator->paginate(
+    #[Route('/orders/{type}', name:'app_orders_show')]
+    public function getAllOrdes($type,OrderRepository $orderRepository, PaginatorInterface $paginator, Request $request):Response
+{      if($type == 'is-completed'){
+            $data = $orderRepository->findBy(['isCompleted'=>1],['id'=>'DESC']);
+        }else if($type == 'pay-on-stripe-not-delivered'){
+            $data = $orderRepository->findBy(['isCompleted'=>null,'payOnDelivery'=>0,'isPaymentCompleted'=>1],['id'=>'DESC']);
+        }else if($type == 'pay-on-stripe-is-delivered'){
+            $data = $orderRepository->findBy(['isCompleted'=>1,'payOnDelivery'=>0,'isPaymentCompleted'=>1],['id'=>'DESC']);
+        }else if($type == 'no_delivery'){
+            $data = $orderRepository->findBy(['isCompleted'=>null,'payOnDelivery'=>0,'isPaymentCompleted'=>0],['id'=>'DESC']);
+        }
+        //dd($orders);
+
+        $orders = $paginator->paginate(
             $data,
             $request->query->getInt('page', 1),
-            1
+            1 
         );
-    
-    return $this->render('order/order.html.twig', [
-        'orders'=>$orders
-    ]);
+
+        return $this->render('order/order.html.twig', [
+            "orders"=>$orders
+        ]);   
+
+
 }
 
 #[Route('/order/{id}/is-completed/update', name:'app_orders_is-completed-update')]
 
-public function isCompletedUpdate($id,OrderRepository $orderRepository, EntityManagerInterface $entityManager):Response
+public function isCompletedUpdate(Request $request,$id,OrderRepository $orderRepository, EntityManagerInterface $entityManager):Response
 { 
         $order = $orderRepository->find($id);
         $order->setIsCompleted(!$order->isCompleted());
         $entityManager->flush();
               
 
-        return $this->redirectToRoute('app_orders_show');
+        return $this->redirect($request->headers->get('referer'));
 
 }
 
