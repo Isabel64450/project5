@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{# {% extends 'base.html.twig' %}
 
 {% block title %}Log in!{% endblock %}
 
@@ -70,3 +70,18 @@
 
 
 {% endblock %}
+ #}
+
+
+
+ <h1>Connexion</h1>
+
+<form class="loginForm" method="post">
+    <label for="email">Email:</label>
+    <input type="email" name="email" id="email" required>
+
+    <label for="password">Mot de passe:</label>
+    <input type="password" name="password" id="password" required>
+
+    <button type="submit">Se connecter</button>
+</form>
