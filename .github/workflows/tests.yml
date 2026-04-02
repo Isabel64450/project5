@@ -39,6 +39,7 @@ jobs:
       run: |
         echo "APP_ENV=test" > .env
         echo "APP_SECRET=ci_secret" >> .env
+        echo "DEFAULT_URI=http://localhost" >> .env
         echo 'DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"' >> .env
     # 3. Mise en cache des dépendances Composer
     # Permet d'accélérer les builds suivants en sauvegardant le dossier 'vendor'
