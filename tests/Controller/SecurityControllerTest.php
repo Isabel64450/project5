@@ -23,11 +23,33 @@ class SecurityControllerTest extends WebTestCase
     {
        
         $client = static::createClient();
-        /* $container = static::getContainer();        
+        $container = static::getContainer();        
         $userProvider = $container->get('security.user.provider.concrete.app_user_provider_test');        
-        $user = $userProvider->loadUserByIdentifier('test@test.com');   */     
-        /* $client->loginUser('test@test.com','password'); */       
+        $user = $userProvider->loadUserByIdentifier('test@test.com');       
+        $client->loginUser($user);  
         $client->request('GET', '/login');        
         $this->assertResponseIsSuccessful();
     }
+    public function testLogoutWorks(): void
+    {
+        $client = static::createClient();       
+        $container = static::getContainer();       
+        $userProvider = $container->get('security.user.provider.concrete.app_user_provider_test');   
+        $user = $userProvider->loadUserByIdentifier('test@test.com');        
+        $client->loginUser($user);
+        $client->request('GET', '/logout');        
+        $this->assertResponseRedirects();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }
