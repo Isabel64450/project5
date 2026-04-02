@@ -35,6 +35,11 @@ jobs:
         php-version: '8.3'  # Force la version de PHP correspondant à votre projet
         extensions: sqlite3  # Installe SQLite (souvent utilisé pour des tests rapides sans base de données lourde)
 
+    - name: Create .env for CI
+      run: |
+        echo "APP_ENV=test" > .env
+        echo "APP_SECRET=ci_secret" >> .env
+        echo 'DATABASE_URL="sqlite:///%kernel.project_dir%/var/data.db"' >> .env
     # 3. Mise en cache des dépendances Composer
     # Permet d'accélérer les builds suivants en sauvegardant le dossier 'vendor'
     - name: Cache Composer
